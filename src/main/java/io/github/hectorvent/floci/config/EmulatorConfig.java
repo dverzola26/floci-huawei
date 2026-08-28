@@ -595,6 +595,22 @@ public interface EmulatorConfig {
 
         @WithDefault("00000000000000000000000000000000")
         String defaultDomainId();
+
+        HuaweiAuthConfig auth();
+    }
+
+    interface HuaweiAuthConfig {
+        @WithDefault("false")
+        boolean validateSignatures();
+
+        @WithDefault("test")
+        String accessKey();
+
+        @WithDefault("test")
+        String secretKey();
+
+        @WithDefault("900")
+        long maxClockSkewSeconds();
     }
 
     interface ServicesConfig {

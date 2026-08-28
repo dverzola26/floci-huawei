@@ -23,6 +23,7 @@ class HuaweiRequestContextFilterTest {
 
     private EmulatorConfig.HuaweiConfig config;
     private HuaweiRequestContext requestContext;
+    private HuaweiSignatureVerifier signatureVerifier;
     private HuaweiRequestContextFilter filter;
 
     @BeforeEach
@@ -33,13 +34,19 @@ class HuaweiRequestContextFilterTest {
         when(config.defaultProjectId()).thenReturn(DEFAULT_PROJECT);
         when(config.defaultDomainId()).thenReturn(DEFAULT_DOMAIN);
         requestContext = new HuaweiRequestContext();
-        filter = new HuaweiRequestContextFilter(config, new HuaweiRequestClassifier(), requestContext);
+        signatureVerifier = mock(HuaweiSignatureVerifier.class);
+        filter = new HuaweiRequestContextFilter(
+                config,
+                new HuaweiRequestClassifier(),
+                new HuaweiAuthorizationParser(),
+                signatureVerifier,
+                requestContext);
     }
 
     @Test
     void initializesHuaweiContextFromStandardAuthorization() {
         ContainerRequestContext context = context(
-                "SDK-HMAC-SHA256 Access=test, SignedHeaders=host;x-sdk-date, Signature=abc");
+                "SDK-HMAC-SHA256 Access=test, SignedHeaders=host;x-sdk-date, Signature=" + "a".repeat(64));
 
         filter.filter(context);
 
@@ -48,6 +55,7 @@ class HuaweiRequestContextFilterTest {
         assertEquals(DEFAULT_REGION, requestContext.getRegionId());
         assertEquals(DEFAULT_PROJECT, requestContext.getProjectId());
         assertEquals(DEFAULT_DOMAIN, requestContext.getDomainId());
+        assertEquals("test", requestContext.getAccessKey());
         assertEquals(HuaweiAuthAlgorithm.SDK_HMAC_SHA256, requestContext.getAuthenticationAlgorithm());
         verify(context).setProperty(
                 HuaweiRequestClassifier.REQUEST_PROPERTY, HuaweiAuthAlgorithm.SDK_HMAC_SHA256);
@@ -56,7 +64,8 @@ class HuaweiRequestContextFilterTest {
     @Test
     void headerScopesOverrideConfiguredDefaults() {
         ContainerRequestContext context = context(
-                "V11-HMAC-SHA256 Credential=test/20260828/region-2/ecs, SignedHeaders=host, Signature=abc");
+                "V11-HMAC-SHA256 Credential=test/20260828/region-2/ecs, "
+                        + "SignedHeaders=host;x-sdk-date, Signature=" + "b".repeat(64));
         when(context.getHeaderString("X-Project-Id")).thenReturn("project-2");
         when(context.getHeaderString("X-Domain-Id")).thenReturn("domain-2");
 
@@ -64,6 +73,8 @@ class HuaweiRequestContextFilterTest {
 
         assertEquals("project-2", requestContext.getProjectId());
         assertEquals("domain-2", requestContext.getDomainId());
+        assertEquals("region-2", requestContext.getRegionId());
+        assertEquals("ecs", requestContext.getServiceName());
         assertEquals(HuaweiAuthAlgorithm.V11_HMAC_SHA256, requestContext.getAuthenticationAlgorithm());
     }
 

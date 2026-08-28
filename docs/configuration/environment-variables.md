@@ -33,6 +33,10 @@ Floci is configured exclusively through environment variables. Every option belo
 | `FLOCI_HUAWEI_DEFAULT_REGION` | `region-1` | Region used when a Huawei request does not carry a derived-auth region scope |
 | `FLOCI_HUAWEI_DEFAULT_PROJECT_ID` | `00000000000000000000000000000000` | Project ID used when `X-Project-Id` and a route project are absent |
 | `FLOCI_HUAWEI_DEFAULT_DOMAIN_ID` | `00000000000000000000000000000000` | Domain ID used when `X-Domain-Id` and a route domain are absent |
+| `FLOCI_HUAWEI_AUTH_VALIDATE_SIGNATURES` | `false` | Validate Huawei AK/SK request signatures |
+| `FLOCI_HUAWEI_AUTH_ACCESS_KEY` | `test` | Local access key accepted when signature validation is enabled |
+| `FLOCI_HUAWEI_AUTH_SECRET_KEY` | `test` | Local secret key used when signature validation is enabled |
+| `FLOCI_HUAWEI_AUTH_MAX_CLOCK_SKEW_SECONDS` | `900` | Maximum accepted difference from `X-Sdk-Date` |
 
 ## Browser CORS
 

@@ -60,5 +60,9 @@ class ApplicationDefaultsTest {
         assertEquals("region-1", huawei.path("default-region").asText());
         assertEquals("00000000000000000000000000000000", huawei.path("default-project-id").asText());
         assertEquals("00000000000000000000000000000000", huawei.path("default-domain-id").asText());
+        assertFalse(huawei.path("auth").path("validate-signatures").asBoolean(true));
+        assertEquals("test", huawei.path("auth").path("access-key").asText());
+        assertEquals("test", huawei.path("auth").path("secret-key").asText());
+        assertEquals(900, huawei.path("auth").path("max-clock-skew-seconds").asLong());
     }
 }
