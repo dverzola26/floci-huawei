@@ -1,0 +1,29 @@
+{
+  "generatedBy": {
+    "sdk": "Huawei Cloud SDK for Python v3 core",
+    "version": "3.1.212",
+    "commit": "28849cc43a39"
+  },
+  "requests": [
+    {
+      "name": "standard-get",
+      "algorithm": "SDK-HMAC-SHA256",
+      "method": "GET",
+      "host": "service.endpoint.myhuaweicloud.com",
+      "sdkDate": "20200608T023900Z",
+      "body": "",
+      "authorization": "SDK-HMAC-SHA256 Access=AccessKey, SignedHeaders=host;x-sdk-date, Signature=cfb4171acec81de07d50e53d57eb77edd537414d66ddb1d7d780f128e12cd842"
+    },
+    {
+      "name": "derived-post",
+      "algorithm": "V11-HMAC-SHA256",
+      "method": "POST",
+      "host": "service.endpoint.myhuaweicloud.com",
+      "sdkDate": "20200608T023900Z",
+      "body": "{\"name\":\"test\",\"id\":1}",
+      "regionId": "test-region-1",
+      "serviceName": "demo",
+      "authorization": "V11-HMAC-SHA256 Credential=AccessKey/20200608/test-region-1/demo, SignedHeaders=host;x-sdk-date, Signature=8e2d91eaf9656ec5d6fab27812e2d898a35aaaa5e16ee0a0365c38527ccfb3cf"
+    }
+  ]
+}
