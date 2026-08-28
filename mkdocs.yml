@@ -1,8 +1,8 @@
-site_name: Floci
-site_description: Fast, free, open-source local AWS emulator
-site_url: https://floci.io/floci/
-repo_url: https://github.com/floci-io/floci
-repo_name: floci-io/floci
+site_name: Floci Huawei Cloud
+site_description: Independent local Huawei Cloud API emulator built from the Floci foundation
+site_url: https://dverzola26.github.io/floci-huawei/
+repo_url: https://github.com/dverzola26/floci-huawei
+repo_name: dverzola26/floci-huawei
 edit_uri: edit/main/docs/
 
 theme:
@@ -56,6 +56,9 @@ markdown_extensions:
 
 nav:
   - Home: index.md
+  - Huawei Cloud:
+    - Roadmap: huawei-cloud-roadmap.md
+    - Provider Architecture: design/huawei-cloud-provider.md
   - Getting Started:
     - Quick Start: getting-started/quick-start.md
     - Installation: getting-started/installation.md
