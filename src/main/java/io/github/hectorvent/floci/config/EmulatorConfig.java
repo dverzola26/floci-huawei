@@ -63,6 +63,8 @@ public interface EmulatorConfig {
 
     AuthConfig auth();
 
+    HuaweiConfig huawei();
+
     SecurityConfig security();
 
     ServicesConfig services();
@@ -579,6 +581,20 @@ public interface EmulatorConfig {
 
         @WithDefault("local-emulator-secret")
         String presignSecret();
+    }
+
+    interface HuaweiConfig {
+        @WithDefault("true")
+        boolean enabled();
+
+        @WithDefault("region-1")
+        String defaultRegion();
+
+        @WithDefault("00000000000000000000000000000000")
+        String defaultProjectId();
+
+        @WithDefault("00000000000000000000000000000000")
+        String defaultDomainId();
     }
 
     interface ServicesConfig {

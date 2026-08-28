@@ -89,6 +89,12 @@ floci:
     validate-signatures: false
     presign-secret: test-secret
 
+  huawei:
+    enabled: true
+    default-region: region-1
+    default-project-id: "00000000000000000000000000000000"
+    default-domain-id: "00000000000000000000000000000000"
+
   security:
     disable-cors-headers: false
 
