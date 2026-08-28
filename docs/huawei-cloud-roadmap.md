@@ -14,7 +14,7 @@ credentials and predictable local resources.
 | Phase | Scope | Exit criteria |
 |---|---|---|
 | 0 — Foundation | Project direction, architecture, service priorities, compatibility policy | Decisions documented; no runtime behavior changed |
-| 1 — Core protocol | Huawei routing, SDK-HMAC-SHA256 verification, regions, projects, domains, request IDs, common errors | A signed official SDK request reaches a test service and receives a Huawei-shaped response |
+| 1 — Core protocol | Huawei routing, standard and derived HMAC verification, regions, projects, domains, request IDs, common errors | Signed official SDK requests using `SDK-HMAC-SHA256` and `V11-HMAC-SHA256` reach a test service and receive Huawei-shaped responses |
 | 2 — OBS | Buckets, objects, listing, metadata, multipart upload, signed URLs | Huawei OBS SDK integration tests pass for the documented operations |
 | 3 — FunctionGraph | Functions, versions, aliases, invocation, logs, Docker execution | Official SDK can create and invoke a local function |
 | 4 — ECS and VPC | Servers, images, flavors, VPCs, subnets, security groups, NICs | Official SDK can provision and inspect a locally represented server and network |
@@ -57,7 +57,7 @@ Reuse means sharing internal behavior, not exposing AWS APIs as Huawei APIs.
 1. Record canonical Huawei API samples from official SDK-generated requests.
 2. Add provider-neutral request metadata without changing existing AWS behavior.
 3. Implement Huawei endpoint routing and common error envelopes.
-4. Implement SDK-HMAC-SHA256 canonical request verification behind an opt-in setting.
+4. Implement `SDK-HMAC-SHA256` and `V11-HMAC-SHA256` canonical request verification behind an opt-in setting.
 5. Add region, project, and domain-aware storage namespaces.
 6. Build a minimal diagnostic service used only by compatibility tests.
 7. Implement OBS as the first public Huawei service.
@@ -81,4 +81,3 @@ Every preview release must:
 - Document service limitations and intentional deviations
 - Start without real cloud credentials or network access
 - Retain third-party license and attribution notices
-
