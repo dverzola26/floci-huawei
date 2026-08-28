@@ -315,6 +315,15 @@ class EventBridgeSchedulerIntegrationTest {
             @Override
             public AuthConfig auth() { return null; }
             @Override
+            public HuaweiConfig huawei() {
+                return new HuaweiConfig() {
+                    @Override public boolean enabled() { return true; }
+                    @Override public String defaultRegion() { return REGION; }
+                    @Override public String defaultProjectId() { return "00000000000000000000000000000000"; }
+                    @Override public String defaultDomainId() { return "00000000000000000000000000000000"; }
+                };
+            }
+            @Override
             public SecurityConfig security() { return null; }
             @Override
             public ServicesConfig services() { return null; }

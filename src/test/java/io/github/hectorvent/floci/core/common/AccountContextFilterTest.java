@@ -1,5 +1,7 @@
 package io.github.hectorvent.floci.core.common;
 
+import io.github.hectorvent.floci.core.huawei.HuaweiAuthAlgorithm;
+import io.github.hectorvent.floci.core.huawei.HuaweiRequestClassifier;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.MultivaluedHashMap;
 import jakarta.ws.rs.core.MultivaluedMap;
@@ -11,6 +13,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -72,6 +75,19 @@ class AccountContextFilterTest {
         filter.filter(ctx);
         assertEquals(DEFAULT_ACCOUNT, requestContext.getAccountId());
         assertEquals(DEFAULT_REGION, requestContext.getRegion());
+    }
+
+    @Test
+    void doesNotPopulateAwsContextForHuaweiRequest() {
+        ContainerRequestContext ctx = mockContext(
+                "SDK-HMAC-SHA256 Access=test, SignedHeaders=host;x-sdk-date, Signature=abc", null);
+        when(ctx.getProperty(HuaweiRequestClassifier.REQUEST_PROPERTY))
+                .thenReturn(HuaweiAuthAlgorithm.SDK_HMAC_SHA256);
+
+        filter.filter(ctx);
+
+        assertNull(requestContext.getAccountId());
+        assertNull(requestContext.getRegion());
     }
 
     @Test

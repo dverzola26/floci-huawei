@@ -1,5 +1,6 @@
 package io.github.hectorvent.floci.core.common;
 
+import io.github.hectorvent.floci.core.huawei.HuaweiRequestClassifier;
 import jakarta.annotation.Priority;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -44,6 +45,9 @@ public class AccountContextFilter implements ContainerRequestFilter {
 
     @Override
     public void filter(ContainerRequestContext ctx) {
+        if (HuaweiRequestClassifier.isHuaweiRequest(ctx)) {
+            return;
+        }
         String auth = ctx.getHeaderString("Authorization");
         if (auth != null && !auth.isEmpty()) {
             String akid = accountResolver.extractAccessKeyId(auth);

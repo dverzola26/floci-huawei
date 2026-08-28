@@ -50,4 +50,15 @@ class ApplicationDefaultsTest {
                         .asBoolean(true),
                 "production application.yml should not create default admin credentials unless enabled");
     }
+
+    @Test
+    void productionConfigEnablesHuaweiFoundationWithLocalScopes() throws IOException {
+        JsonNode config = new YAMLMapper().readTree(Path.of("src/main/resources/application.yml").toFile());
+        JsonNode huawei = config.path("floci").path("huawei");
+
+        assertTrue(huawei.path("enabled").asBoolean(false));
+        assertEquals("region-1", huawei.path("default-region").asText());
+        assertEquals("00000000000000000000000000000000", huawei.path("default-project-id").asText());
+        assertEquals("00000000000000000000000000000000", huawei.path("default-domain-id").asText());
+    }
 }

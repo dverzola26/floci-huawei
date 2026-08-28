@@ -1,5 +1,6 @@
 package io.github.hectorvent.floci.core.common;
 
+import io.github.hectorvent.floci.core.huawei.HuaweiRequestClassifier;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerResponseContext;
 import jakarta.ws.rs.container.ContainerResponseFilter;
@@ -31,6 +32,9 @@ public class AwsRequestIdFilter implements ContainerResponseFilter {
 
     @Override
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) {
+        if (HuaweiRequestClassifier.isHuaweiRequest(requestContext)) {
+            return;
+        }
         var headers = responseContext.getHeaders();
 
         // Reuse the same ID across all header variants for this response

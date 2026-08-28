@@ -25,6 +25,15 @@ Floci is configured exclusively through environment variables. Every option belo
 | `FLOCI_AUTH_VALIDATE_SIGNATURES` | `false` | When `true`, verifies S3 presigned URL signatures |
 | `FLOCI_AUTH_PRESIGN_SECRET` | `local-emulator-secret` | Secret used to sign and verify pre-signed URLs |
 
+## Huawei Cloud foundation
+
+| Variable | Default | Description |
+|---|---|---|
+| `FLOCI_HUAWEI_ENABLED` | `true` | Classify recognized Huawei Cloud SDK authorization algorithms and initialize Huawei request context |
+| `FLOCI_HUAWEI_DEFAULT_REGION` | `region-1` | Region used when a Huawei request does not carry a derived-auth region scope |
+| `FLOCI_HUAWEI_DEFAULT_PROJECT_ID` | `00000000000000000000000000000000` | Project ID used when `X-Project-Id` and a route project are absent |
+| `FLOCI_HUAWEI_DEFAULT_DOMAIN_ID` | `00000000000000000000000000000000` | Domain ID used when `X-Domain-Id` and a route domain are absent |
+
 ## Browser CORS
 
 | Variable | Default | Description |
