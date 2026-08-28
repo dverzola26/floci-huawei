@@ -1,3 +1,14 @@
+> [!IMPORTANT]
+> This repository is the foundation for **Floci Huawei Cloud**, an independent project that aims
+> to provide local Huawei Cloud API emulation. The current baseline still exposes the upstream
+> Floci AWS-compatible APIs while the Huawei compatibility layer is being designed and built.
+> See the [Huawei Cloud roadmap](docs/huawei-cloud-roadmap.md) and
+> [architecture decision](docs/design/huawei-cloud-provider.md).
+
+> [!NOTE]
+> This project is not affiliated with or endorsed by Huawei Cloud or the upstream Floci project.
+> The original Floci source is used under the MIT License and its copyright notice is retained.
+
 <p align="center">
   <img src="docs/assets/floci-black.svg#gh-light-mode-only" alt="Floci" width="500" />
   <img src="docs/assets/floci-white.svg#gh-dark-mode-only" alt="Floci" width="500" />
