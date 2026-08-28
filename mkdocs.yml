@@ -59,6 +59,7 @@ nav:
   - Huawei Cloud:
     - Roadmap: huawei-cloud-roadmap.md
     - Provider Architecture: design/huawei-cloud-provider.md
+    - Core Protocol Design: design/huawei-core-protocol.md
   - Getting Started:
     - Quick Start: getting-started/quick-start.md
     - Installation: getting-started/installation.md
