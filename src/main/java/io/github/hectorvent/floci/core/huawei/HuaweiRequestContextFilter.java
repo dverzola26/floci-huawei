@@ -19,20 +19,28 @@ public class HuaweiRequestContextFilter implements ContainerRequestFilter {
 
     private final EmulatorConfig.HuaweiConfig config;
     private final HuaweiRequestClassifier classifier;
+    private final HuaweiAuthorizationParser authorizationParser;
+    private final HuaweiSignatureVerifier signatureVerifier;
     private final HuaweiRequestContext requestContext;
 
     @Inject
     public HuaweiRequestContextFilter(EmulatorConfig config,
                                       HuaweiRequestClassifier classifier,
+                                      HuaweiAuthorizationParser authorizationParser,
+                                      HuaweiSignatureVerifier signatureVerifier,
                                       HuaweiRequestContext requestContext) {
-        this(config.huawei(), classifier, requestContext);
+        this(config.huawei(), classifier, authorizationParser, signatureVerifier, requestContext);
     }
 
     HuaweiRequestContextFilter(EmulatorConfig.HuaweiConfig config,
                                HuaweiRequestClassifier classifier,
+                               HuaweiAuthorizationParser authorizationParser,
+                               HuaweiSignatureVerifier signatureVerifier,
                                HuaweiRequestContext requestContext) {
         this.config = config;
         this.classifier = classifier;
+        this.authorizationParser = authorizationParser;
+        this.signatureVerifier = signatureVerifier;
         this.requestContext = requestContext;
     }
 
@@ -60,6 +68,12 @@ public class HuaweiRequestContextFilter implements ContainerRequestFilter {
                     "The authorization algorithm " + algorithm.authorizationPrefix() + " is not supported.",
                     501);
         }
+
+        HuaweiAuthorization authorization = authorizationParser.parse(context.getHeaderString("Authorization"));
+        requestContext.setAccessKey(authorization.accessKey());
+        authorization.region().ifPresent(requestContext::setRegionId);
+        authorization.service().ifPresent(requestContext::setServiceName);
+        signatureVerifier.verifyIfEnabled(context, authorization);
     }
 
     private static String headerOrDefault(ContainerRequestContext context, String name, String fallback) {

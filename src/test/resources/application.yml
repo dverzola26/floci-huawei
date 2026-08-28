@@ -94,6 +94,11 @@ floci:
     default-region: region-1
     default-project-id: "00000000000000000000000000000000"
     default-domain-id: "00000000000000000000000000000000"
+    auth:
+      validate-signatures: false
+      access-key: test
+      secret-key: test
+      max-clock-skew-seconds: 900
 
   security:
     disable-cors-headers: false

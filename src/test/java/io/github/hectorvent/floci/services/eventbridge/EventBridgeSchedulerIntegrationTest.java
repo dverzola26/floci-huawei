@@ -321,6 +321,14 @@ class EventBridgeSchedulerIntegrationTest {
                     @Override public String defaultRegion() { return REGION; }
                     @Override public String defaultProjectId() { return "00000000000000000000000000000000"; }
                     @Override public String defaultDomainId() { return "00000000000000000000000000000000"; }
+                    @Override public HuaweiAuthConfig auth() {
+                        return new HuaweiAuthConfig() {
+                            @Override public boolean validateSignatures() { return false; }
+                            @Override public String accessKey() { return "test"; }
+                            @Override public String secretKey() { return "test"; }
+                            @Override public long maxClockSkewSeconds() { return 900; }
+                        };
+                    }
                 };
             }
             @Override
