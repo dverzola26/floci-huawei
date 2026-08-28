@@ -19,6 +19,7 @@
         <jackson.version>2.22.1</jackson.version>
         <apicurio.version>2.6.13.Final</apicurio.version>
         <wire.version>6.4.5</wire.version>
+        <huaweicloud.sdk.core.version>3.1.213</huaweicloud.sdk.core.version>
     </properties>
 
     <dependencyManagement>
@@ -266,6 +267,12 @@
         </dependency>
 
         <!-- Testing -->
+        <dependency>
+            <groupId>com.huaweicloud.sdk</groupId>
+            <artifactId>huaweicloud-sdk-core</artifactId>
+            <version>${huaweicloud.sdk.core.version}</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-junit</artifactId>
