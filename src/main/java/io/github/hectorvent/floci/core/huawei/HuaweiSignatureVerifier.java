@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-/** Optionally validates standard Huawei Cloud SDK-HMAC-SHA256 request signatures. */
+/** Optionally validates standard and derived Huawei Cloud HMAC request signatures. */
 @ApplicationScoped
 public class HuaweiSignatureVerifier {
 
@@ -63,13 +63,6 @@ public class HuaweiSignatureVerifier {
         if (!config.validateSignatures()) {
             return;
         }
-        if (authorization.algorithm() != HuaweiAuthAlgorithm.SDK_HMAC_SHA256) {
-            throw new HuaweiException(
-                    "FLOCI.HUAWEI.AUTH.0002",
-                    "Signature validation for " + authorization.algorithm().authorizationPrefix()
-                            + " is not implemented yet.",
-                    501);
-        }
         if (!constantTimeEquals(authorization.accessKey(), config.accessKey())) {
             throw new HuaweiException(
                     UNKNOWN_ACCESS_KEY_CODE, "The configured access key does not match the request.", 401);
@@ -79,8 +72,19 @@ public class HuaweiSignatureVerifier {
         validateDate(date);
         byte[] body = readAndRestoreBody(context);
         URI uri = context.getUriInfo().getRequestUri();
-        String expected = calculateSignature(
-                context.getMethod(), uri, context.getHeaders(), body, authorization, date, config.secretKey());
+        String expected = switch (authorization.algorithm()) {
+            case SDK_HMAC_SHA256 -> calculateSignature(
+                    context.getMethod(), uri, context.getHeaders(), body,
+                    authorization, date, config.secretKey());
+            case V11_HMAC_SHA256 -> calculateDerivedSignature(
+                    context.getMethod(), uri, context.getHeaders(), body,
+                    authorization, date, config.secretKey());
+            default -> throw new HuaweiException(
+                    "FLOCI.HUAWEI.AUTH.0002",
+                    "Signature validation for " + authorization.algorithm().authorizationPrefix()
+                            + " is not implemented.",
+                    501);
+        };
 
         if (!constantTimeHexEquals(expected, authorization.signature())) {
             throw new HuaweiException(INVALID_SIGNATURE_CODE, "The request signature is invalid.", 401);
@@ -102,6 +106,42 @@ public class HuaweiSignatureVerifier {
                 HuaweiCanonicalRequest.sha256Hex(canonical.value().getBytes(StandardCharsets.UTF_8)));
         return HEX.formatHex(hmacSha256(secretKey.getBytes(StandardCharsets.UTF_8),
                 stringToSign.getBytes(StandardCharsets.UTF_8)));
+    }
+
+    String calculateDerivedSignature(String method,
+                                     URI uri,
+                                     Map<String, ? extends List<String>> headers,
+                                     byte[] body,
+                                     HuaweiAuthorization authorization,
+                                     String sdkDate,
+                                     String secretKey) {
+        String scope = derivedScope(authorization, sdkDate);
+        HuaweiCanonicalRequest.Canonicalized canonical = canonicalRequest.canonicalize(
+                method, uri, headers, authorization.signedHeaders(), body);
+        String stringToSign = String.join("\n",
+                HuaweiAuthAlgorithm.V11_HMAC_SHA256.authorizationPrefix(),
+                sdkDate,
+                scope,
+                HuaweiCanonicalRequest.sha256Hex(canonical.value().getBytes(StandardCharsets.UTF_8)));
+        String derivedHexKey = HuaweiHkdf.deriveHexKey(authorization.accessKey(), secretKey, scope);
+        return HEX.formatHex(hmacSha256(derivedHexKey.getBytes(StandardCharsets.UTF_8),
+                stringToSign.getBytes(StandardCharsets.UTF_8)));
+    }
+
+    private static String derivedScope(HuaweiAuthorization authorization, String sdkDate) {
+        String date = authorization.date().orElseThrow(
+                () -> HuaweiAuthorizationParser.malformed("The derived credential date is missing."));
+        String region = authorization.region().orElseThrow(
+                () -> HuaweiAuthorizationParser.malformed("The derived credential region is missing."));
+        String service = authorization.service().orElseThrow(
+                () -> HuaweiAuthorizationParser.malformed("The derived credential service is missing."));
+        if (sdkDate == null || sdkDate.length() < 8 || !date.equals(sdkDate.substring(0, 8))) {
+            throw new HuaweiException(
+                    INVALID_DATE_CODE,
+                    "The derived credential date does not match X-Sdk-Date.",
+                    401);
+        }
+        return date + "/" + region + "/" + service;
     }
 
     private void validateDate(String value) {
