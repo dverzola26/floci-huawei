@@ -53,6 +53,14 @@ Virtual-hosted bucket routing such as `bucket.obs.localhost` is deferred until p
 is stable. Official SDK compatibility tests must enable their path-style option when the SDK
 provides one.
 
+These public paths overlap the inherited S3 surface. OBS requests therefore must not be exposed by
+a second controller with the same JAX-RS paths. A high-priority pre-matching filter positively
+classifies OBS authentication, records the original raw request target for signature verification,
+and rewrites only classified requests to one fixed reserved internal OBS path. The controller
+dispatches from the recorded original route and rejects direct calls that lack the server-side OBS
+marker. The inherited S3 router continues to own unclassified, AWS-authenticated, and unsigned
+requests.
+
 ## OBS request classification
 
 OBS authentication is distinct from the general Huawei Cloud SDK algorithms implemented in Phase
@@ -63,6 +71,38 @@ OBS authentication is distinct from the general Huawei Cloud SDK algorithms impl
 
 OBS classification must occur only for routes that match the OBS endpoint contract. A generic
 query string containing `Signature` must never reclassify an inherited AWS request.
+
+Header classification recognizes the exact `OBS` authorization scheme even when the credentials
+are malformed, so parser failures return OBS XML instead of falling through to S3. Accepted header
+authentication requires a strict `Authorization: OBS <access-key>:<signature>` value with nonblank
+fields, one separator, and no control characters. Query classification requires the complete
+`AccessKeyId`, `Expires`, and `Signature` tuple; one or two matching parameter names are
+insufficient. Classification records a provider-wide Huawei marker and an OBS service claim that
+make inherited AWS protocol-claim, IAM, account, virtual-host, and request-ID filters skip the
+request. OBS uses a dedicated context and response-ID filter rather than the Phase 1 general Huawei
+JSON error path.
+
+Legacy OBS signatures use this canonical string:
+
+```text
+HTTP-Method + "\n" +
+Content-MD5 + "\n" +
+Content-Type + "\n" +
+Date-or-Expires + "\n" +
+CanonicalizedObsHeaders + CanonicalizedResource
+```
+
+The signature is Base64-encoded `HMAC-SHA1` using the configured secret key. `x-obs-date` takes
+precedence over `Date` and leaves the Date line empty. Canonical `x-obs-*` headers are lowercased,
+trimmed, folded, and sorted lexicographically; recognized signed subresources are sorted and
+included in the canonical resource. Verification uses the original encoded request path and query
+representation rather than a framework-normalized path, while resource lookup decodes an object
+key exactly once. Header authentication enforces a configurable clock-skew window, initially 15
+minutes. Signed-query authentication uses `Expires` as its time value.
+
+The initial signed-subresource allowlist is `uploads`, `uploadId`, and `partNumber`, matching the
+planned multipart operations. Later pull requests must extend this list deliberately when adding
+another signed subresource; arbitrary query parameters never enter the canonical resource.
 
 The following are deferred:
 
@@ -94,6 +134,10 @@ Service errors use the OBS XML envelope:
   <HostId>...</HostId>
 </Error>
 ```
+
+Methods that permit response bodies return this XML envelope. `HEAD` errors return the same HTTP
+status and OBS request-ID headers without relying on an XML response body. Malformed OBS
+authentication is rejected through the OBS error mapper before controller dispatch.
 
 Object downloads stream the stored bytes and preserve standard content headers. Control-plane
 responses use UTF-8 XML. Successful empty responses do not include invented JSON bodies.
@@ -137,7 +181,8 @@ and distinguishable but are not promised to match real OBS internal encryption o
 
 Bucket listing supports `prefix`, `marker`, `delimiter`, and `max-keys`.
 
-- Results are ordered lexicographically by encoded object key.
+- Results are ordered lexicographically by object name; optional output encoding does not change
+  the sort key.
 - `max-keys` is bounded and validated.
 - Truncated responses return the correct continuation marker.
 - A delimiter groups common prefixes without returning those keys as ordinary contents.
@@ -227,6 +272,7 @@ Proposed components:
 | Component | Responsibility |
 |---|---|
 | `ObsRequestClassifier` | Recognize OBS header and query authentication only on OBS routes |
+| `ObsRoutingFilter` | Mark OBS service context, preserve the raw target, and rewrite to an internal route |
 | `ObsAuthorization` | Parsed header or signed-query credentials |
 | `ObsSignatureVerifier` | OBS canonical-string and expiry verification |
 | `ObsController` | REST routing, headers, XML, ranges, and streaming |
@@ -242,7 +288,8 @@ this document.
 
 1. **Contract and matrix** — this document; no runtime behavior.
 2. **Routing and OBS authentication** — request classification, path-style routing, XML errors,
-   header signature fixtures, and inherited AWS isolation tests.
+   fixed header-signature fixtures, inherited AWS isolation tests, and one signed missing-bucket
+   round trip from each pinned Java and Python OBS SDK. Full bucket lifecycle remains PR 3.
 3. **Bucket lifecycle** — list, create, metadata/head, delete, region and owner semantics.
 4. **Object lifecycle** — put, get, head, delete, streaming, ranges, and metadata.
 5. **Listing and pagination** — prefix, marker, delimiter, max-keys, and common prefixes.
