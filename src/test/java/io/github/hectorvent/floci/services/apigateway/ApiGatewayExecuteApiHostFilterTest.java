@@ -356,6 +356,7 @@ class ApiGatewayExecuteApiHostFilterTest {
                     new Class<?>[] { ContainerRequestContext.class },
                     (proxy, method, args) -> switch (method.getName()) {
                         case "getHeaderString" -> header((String) args[0]);
+                        case "getProperty" -> null;
                         case "getUriInfo" -> uriInfo();
                         case "setRequestUri" -> {
                             routedUri = (URI) args[0];

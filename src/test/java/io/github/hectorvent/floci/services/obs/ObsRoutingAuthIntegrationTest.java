@@ -63,7 +63,7 @@ class ObsRoutingAuthIntegrationTest {
                 .withEndpoint("http://java-sdk-missing-bucket.obs.localhost:" + endpoint.getPort())
                 .withMethod(HttpMethod.HEAD)
                 .withPath("/")
-                .addHeader("Date", FIXED_DATE)
+                .addHeader("date", FIXED_DATE)
                 .build();
         HttpRequest signed = new ObsSigner(credentials).sign(source);
         HttpRequest.HttpRequestBuilder transportBuilder = HttpRequest.newBuilder()
