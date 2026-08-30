@@ -54,6 +54,7 @@ public class HuaweiRequestContextFilter implements ContainerRequestFilter {
     }
 
     private void initialize(ContainerRequestContext context, HuaweiAuthAlgorithm algorithm) {
+        HuaweiRequestClassifier.markHuaweiRequest(context);
         context.setProperty(HuaweiRequestClassifier.REQUEST_PROPERTY, algorithm);
         requestContext.setHuaweiRequest(true);
         requestContext.setRequestId(UUID.randomUUID().toString());

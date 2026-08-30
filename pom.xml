@@ -274,6 +274,12 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>com.huaweicloud.sdk</groupId>
+            <artifactId>huaweicloud-sdk-obs</artifactId>
+            <version>${huaweicloud.sdk.core.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-junit</artifactId>
             <scope>test</scope>

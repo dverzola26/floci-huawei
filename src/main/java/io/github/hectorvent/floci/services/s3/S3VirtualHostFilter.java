@@ -4,6 +4,7 @@ import io.github.hectorvent.floci.config.EmulatorConfig;
 import io.github.hectorvent.floci.core.common.AwsRegions;
 import io.github.hectorvent.floci.core.common.dns.EmbeddedDnsServer;
 import io.github.hectorvent.floci.core.common.docker.ContainerDetector;
+import io.github.hectorvent.floci.core.huawei.HuaweiRequestClassifier;
 import io.github.hectorvent.floci.services.cloudfront.CloudFrontDistributionFilter;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -93,6 +94,9 @@ public class S3VirtualHostFilter implements ContainerRequestFilter {
 
     @Override
     public void filter(ContainerRequestContext requestContext) {
+        if (HuaweiRequestClassifier.isHuaweiRequest(requestContext)) {
+            return;
+        }
         URI uri = requestContext.getUriInfo().getRequestUri();
 
         // HTTP/2 (RFC 9113) has no "Host" header — the authority travels in the

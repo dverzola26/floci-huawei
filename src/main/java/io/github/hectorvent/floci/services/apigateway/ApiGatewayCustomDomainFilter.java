@@ -1,5 +1,6 @@
 package io.github.hectorvent.floci.services.apigateway;
 
+import io.github.hectorvent.floci.core.huawei.HuaweiRequestClassifier;
 import io.github.hectorvent.floci.services.apigateway.model.BasePathMapping;
 import io.github.hectorvent.floci.services.apigateway.model.CustomDomain;
 import jakarta.annotation.Priority;
@@ -41,6 +42,9 @@ public class ApiGatewayCustomDomainFilter implements ContainerRequestFilter {
 
     @Override
     public void filter(ContainerRequestContext requestContext) {
+        if (HuaweiRequestClassifier.isHuaweiRequest(requestContext)) {
+            return;
+        }
         String host = requestContext.getHeaderString("Host");
         if (host == null) {
             return;

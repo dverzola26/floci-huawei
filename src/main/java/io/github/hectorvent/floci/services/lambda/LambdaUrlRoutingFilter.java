@@ -1,5 +1,6 @@
 package io.github.hectorvent.floci.services.lambda;
 
+import io.github.hectorvent.floci.core.huawei.HuaweiRequestClassifier;
 import jakarta.annotation.Priority;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerRequestFilter;
@@ -26,6 +27,7 @@ public class LambdaUrlRoutingFilter implements ContainerRequestFilter {
 
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
+        if (HuaweiRequestClassifier.isHuaweiRequest(requestContext)) return;
         String host = requestContext.getHeaderString("Host");
         if (host == null) return;
 
