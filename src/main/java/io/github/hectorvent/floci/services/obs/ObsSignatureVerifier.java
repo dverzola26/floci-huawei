@@ -17,10 +17,14 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Base64;
+import java.util.Locale;
 
 /** Verifies legacy OBS v2 HMAC-SHA1 header and signed-query authentication. */
 @ApplicationScoped
 public class ObsSignatureVerifier {
+
+    private static final DateTimeFormatter PYTHON_SDK_DATE_TIME =
+            DateTimeFormatter.ofPattern("EEE MMM dd yyyy HH:mm:ss z", Locale.US);
 
     private final EmulatorConfig.HuaweiAuthConfig config;
     private final ObsCanonicalRequest canonicalRequest;
@@ -75,7 +79,7 @@ public class ObsSignatureVerifier {
             throw new ObsException("AccessDenied", "A valid Date or x-obs-date header is required.", 403);
         }
         try {
-            Instant requestTime = ZonedDateTime.parse(value, DateTimeFormatter.RFC_1123_DATE_TIME).toInstant();
+            Instant requestTime = parseRequestTime(value);
             long skew = Math.abs(Duration.between(requestTime, now).getSeconds());
             if (skew > config.maxClockSkewSeconds()) {
                 throw new ObsException("RequestTimeTooSkewed",
@@ -83,6 +87,14 @@ public class ObsSignatureVerifier {
             }
         } catch (DateTimeParseException exception) {
             throw new ObsException("AccessDenied", "The request date is invalid.", 403);
+        }
+    }
+
+    private static Instant parseRequestTime(String value) {
+        try {
+            return ZonedDateTime.parse(value, DateTimeFormatter.RFC_1123_DATE_TIME).toInstant();
+        } catch (DateTimeParseException exception) {
+            return ZonedDateTime.parse(value, PYTHON_SDK_DATE_TIME).toInstant();
         }
     }
 

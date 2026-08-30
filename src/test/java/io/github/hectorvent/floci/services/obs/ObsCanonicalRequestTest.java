@@ -37,14 +37,14 @@ class ObsCanonicalRequestTest {
         ContainerRequestContext request = mock(ContainerRequestContext.class);
         MultivaluedHashMap<String, String> headers = new MultivaluedHashMap<>();
         when(request.getHeaders()).thenReturn(headers);
-        when(request.getHeaderString("Date")).thenReturn("Tue, 27 May 2025 12:00:00 GMT");
+        when(request.getHeaderString("Date")).thenReturn("Tue May 27 2025 12:00:00 GMT");
         ObsRequestContext context = new ObsRequestContext();
         context.setMethod("HEAD");
         context.setRawPath("/python-sdk-missing-bucket");
 
         String canonical = new ObsCanonicalRequest().build(request, context,
                 new ObsAuthorization("AccessKey", "signature", null));
-        assertEquals("HEAD\n\n\nTue, 27 May 2025 12:00:00 GMT\n/python-sdk-missing-bucket", canonical);
-        assertEquals("dHGdnXgECUfv/eVo/XdxMhnEXAY=", ObsSignatureVerifier.sign(canonical, "SecretKey"));
+        assertEquals("HEAD\n\n\nTue May 27 2025 12:00:00 GMT\n/python-sdk-missing-bucket", canonical);
+        assertEquals("fclH5I6gB8+oBaFhdjifSOLg+cs=", ObsSignatureVerifier.sign(canonical, "SecretKey"));
     }
 }

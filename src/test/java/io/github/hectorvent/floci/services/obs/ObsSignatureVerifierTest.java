@@ -34,7 +34,7 @@ class ObsSignatureVerifierTest {
                 Clock.fixed(Instant.parse("2025-05-27T12:00:00Z"), ZoneOffset.UTC));
         request = mock(ContainerRequestContext.class);
         when(request.getHeaders()).thenReturn(new MultivaluedHashMap<>());
-        when(request.getHeaderString("Date")).thenReturn("Tue, 27 May 2025 12:00:00 GMT");
+        when(request.getHeaderString("Date")).thenReturn("Tue May 27 2025 12:00:00 GMT");
         context = new ObsRequestContext();
         context.setMethod("HEAD");
         context.setRawPath("/python-sdk-missing-bucket");
@@ -43,7 +43,7 @@ class ObsSignatureVerifierTest {
     @Test
     void acceptsOfficialFixtureAndRejectsCredentialTampering() {
         ObsAuthorization valid = new ObsAuthorization(
-                "AccessKey", "dHGdnXgECUfv/eVo/XdxMhnEXAY=", null);
+                "AccessKey", "fclH5I6gB8+oBaFhdjifSOLg+cs=", null);
         assertDoesNotThrow(() -> verifier.verify(request, context, valid));
 
         assertEquals("InvalidAccessKeyId", assertThrows(ObsException.class,
