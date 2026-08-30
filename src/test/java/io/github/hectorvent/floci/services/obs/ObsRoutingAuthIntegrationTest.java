@@ -66,12 +66,13 @@ class ObsRoutingAuthIntegrationTest {
                 .addHeader("Date", FIXED_DATE)
                 .build();
         HttpRequest signed = new ObsSigner(credentials).sign(source);
-        HttpRequest transport = HttpRequest.newBuilder()
+        HttpRequest.HttpRequestBuilder transportBuilder = HttpRequest.newBuilder()
                 .withEndpoint(endpoint.toString())
                 .withMethod(HttpMethod.HEAD)
-                .withPath("/java-sdk-missing-bucket/")
-                .addHeaders(signed.getHeaders())
-                .build();
+                .withPath("/java-sdk-missing-bucket/");
+        signed.getHeaders().forEach((name, values) ->
+                values.forEach(value -> transportBuilder.addHeader(name, value)));
+        HttpRequest transport = transportBuilder.build();
 
         HttpResponse response = new DefaultHttpClient(new HttpConfig()).syncInvokeHttp(transport);
 
