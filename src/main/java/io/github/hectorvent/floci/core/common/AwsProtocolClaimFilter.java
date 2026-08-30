@@ -1,6 +1,7 @@
 package io.github.hectorvent.floci.core.common;
 
 import io.github.hectorvent.floci.config.EmulatorConfig;
+import io.github.hectorvent.floci.core.huawei.HuaweiRequestClassifier;
 import jakarta.annotation.Priority;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.container.ContainerRequestContext;
@@ -58,6 +59,9 @@ public class AwsProtocolClaimFilter implements ContainerRequestFilter {
 
     @Override
     public void filter(ContainerRequestContext ctx) {
+        if (HuaweiRequestClassifier.isHuaweiRequest(ctx)) {
+            return;
+        }
         ClaimSignals signals = ClaimSignals.from(ctx);
         Optional<ProtocolClaim> claim = claimer.claim(signals);
 

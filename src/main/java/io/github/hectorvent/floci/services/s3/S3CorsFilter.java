@@ -1,5 +1,6 @@
 package io.github.hectorvent.floci.services.s3;
 
+import io.github.hectorvent.floci.core.huawei.HuaweiRequestClassifier;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerResponseContext;
@@ -27,6 +28,8 @@ public class S3CorsFilter implements ContainerResponseFilter {
     @Override
     public void filter(ContainerRequestContext requestContext,
                        ContainerResponseContext responseContext) {
+
+        if (HuaweiRequestClassifier.isHuaweiRequest(requestContext)) return;
 
         // Only handle actual requests — preflights are processed by the OPTIONS endpoints
         if ("OPTIONS".equalsIgnoreCase(requestContext.getMethod())) return;

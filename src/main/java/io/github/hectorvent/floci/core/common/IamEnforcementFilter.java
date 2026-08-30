@@ -1,6 +1,7 @@
 package io.github.hectorvent.floci.core.common;
 
 import io.github.hectorvent.floci.config.EmulatorConfig;
+import io.github.hectorvent.floci.core.huawei.HuaweiRequestClassifier;
 import io.github.hectorvent.floci.services.cloudtrail.CloudTrailService;
 import io.github.hectorvent.floci.services.iam.IamActionRegistry;
 import io.github.hectorvent.floci.services.iam.IamPolicyEvaluator;
@@ -89,6 +90,9 @@ public class IamEnforcementFilter implements ContainerRequestFilter {
 
     @Override
     public void filter(ContainerRequestContext ctx) {
+        if (HuaweiRequestClassifier.isHuaweiRequest(ctx)) {
+            return;
+        }
         if (!config.services().iam().enforcementEnabled()) {
             return;
         }

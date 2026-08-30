@@ -21,7 +21,7 @@ public class HuaweiRequestIdFilter implements ContainerResponseFilter {
 
     @Override
     public void filter(ContainerRequestContext request, ContainerResponseContext response) {
-        if (!HuaweiRequestClassifier.isHuaweiRequest(request)) {
+        if (!HuaweiRequestClassifier.isCoreHuaweiRequest(request)) {
             return;
         }
         if (!response.getHeaders().containsKey(REQUEST_ID_HEADER) && requestContext.getRequestId() != null) {

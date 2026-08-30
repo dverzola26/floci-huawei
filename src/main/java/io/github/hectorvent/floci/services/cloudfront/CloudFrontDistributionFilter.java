@@ -1,5 +1,6 @@
 package io.github.hectorvent.floci.services.cloudfront;
 
+import io.github.hectorvent.floci.core.huawei.HuaweiRequestClassifier;
 import io.github.hectorvent.floci.services.cloudfront.model.Distribution;
 import jakarta.annotation.Priority;
 import jakarta.enterprise.inject.Instance;
@@ -49,6 +50,9 @@ public class CloudFrontDistributionFilter implements ContainerRequestFilter {
 
     @Override
     public void filter(ContainerRequestContext requestContext) {
+        if (HuaweiRequestClassifier.isHuaweiRequest(requestContext)) {
+            return;
+        }
         String host = requestContext.getHeaderString("Host");
         if (host == null) {
             return;
