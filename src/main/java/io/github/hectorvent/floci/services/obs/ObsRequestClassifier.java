@@ -21,7 +21,10 @@ public class ObsRequestClassifier {
         if (authorization != null && !authorization.isBlank()) {
             return false;
         }
-        MultivaluedMap<String, String> query = context.getUriInfo().getQueryParameters(false);
+        // Classification needs only parameter presence. RESTEasy Reactive does not support
+        // non-decoded query maps in native mode; the untouched raw query is preserved separately
+        // by ObsRoutingFilter for signature canonicalization.
+        MultivaluedMap<String, String> query = context.getUriInfo().getQueryParameters(true);
         // Presence claims the request as OBS. Cardinality and value validation belong to the
         // parser so malformed/duplicate tuples receive OBS XML instead of falling through to S3.
         return hasValue(query, "AccessKeyId")

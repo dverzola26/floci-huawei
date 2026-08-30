@@ -41,7 +41,7 @@ class ObsRequestClassifierTest {
         UriInfo uriInfo = mock(UriInfo.class);
         when(request.getHeaderString("Authorization")).thenReturn(authorization);
         when(request.getUriInfo()).thenReturn(uriInfo);
-        when(uriInfo.getQueryParameters(false)).thenReturn(query);
+        when(uriInfo.getQueryParameters(true)).thenReturn(query);
         return request;
     }
 }
